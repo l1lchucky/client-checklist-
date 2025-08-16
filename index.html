@@ -6,105 +6,107 @@
   <title>Client Checklist</title>
   <style>
     body {
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: #fff;
-      padding: 25px 30px;
-      border-radius: 16px;
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Checklist</title>
-  <style>
-    body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
+      background: #f4f4f9;
       margin: 0;
+      padding: 20px;
     }
     .container {
       max-width: 500px;
       margin: auto;
-      background: white;
+      background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     h2 {
       text-align: center;
       margin-bottom: 20px;
     }
     label {
+      font-weight: bold;
       display: block;
-      margin: 12px 0;
+      margin-top: 15px;
     }
-    input[type="text"], input[type="tel"] {
+    input[type="text"] {
       width: 100%;
       padding: 10px;
-      margin-top: 6px;
+      margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 8px;
     }
-    input[type="checkbox"] {
-      transform: scale(1.2);
-      margin-right: 8px;
-    }
-    h3 {
+    .services {
       margin-top: 20px;
-      border-top: 1px solid #ddd;
-      padding-top: 10px;
+    }
+    .services label {
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .services input {
+      margin-right: 10px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+
+  <div class="container" id="checklist">
     <h2>Client Checklist</h2>
+    <label for="clientName">Client Name:</label>
+    <input type="text" id="clientName" placeholder="Enter client name">
 
-    <label>Client Name:
-      <input type="text" id="clientName" placeholder="Enter client name">
-    </label>
-    <label>Phone Number:
-      <input type="tel" id="clientPhone" placeholder="Enter phone number">
-    </label>
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" placeholder="Enter phone number">
 
-    <h3>Services</h3>
-    <label><input type="checkbox" name="visa"> Visa Processed</label>
-    <label><input type="checkbox" name="hotel"> Hotel Booked</label>
-    <label><input type="checkbox" name="flight"> Flight Ticket Confirmed</label>
-    <label><input type="checkbox" name="insurance"> Travel Insurance Added</label>
+    <div class="services">
+      <h3>Services</h3>
+      <label><input type="checkbox" checked> Visa Processed</label>
+      <label><input type="checkbox" checked> Hotel Booked</label>
+      <label><input type="checkbox" checked> Flight Ticket Confirmed</label>
+      <label><input type="checkbox" checked> Travel Insurance Added</label>
+    </div>
   </div>
 
-  <script>
-    // Load saved data
-    window.onload = function() {
-      document.querySelectorAll("input").forEach(input => {
-        if (input.type === "checkbox") {
-          input.checked = localStorage.getItem(input.name) === "true";
-        } else {
-          input.value = localStorage.getItem(input.id) || "";
-        }
+  <button onclick="downloadPDF()">📥 Save as PDF</button>
 
-        input.addEventListener("input", () => {
-          if (input.type === "checkbox") {
-            localStorage.setItem(input.name, input.checked);
-          } else {
-            localStorage.setItem(input.id, input.value);
-          }
-        });
-      });
-    };
+  <!-- jsPDF & html2canvas for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const checklist = document.getElementById("checklist");
+
+      // Convert to canvas
+      const canvas = await html2canvas(checklist);
+      const imgData = canvas.toDataURL("image/png");
+
+      // Create PDF
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("client-checklist.pdf");
+    }
   </script>
+
 </body>
 </html>

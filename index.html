@@ -440,24 +440,555 @@
                 serviceElement.className = `service-item ${service.completed ? 'completed' : ''}`;
                 serviceElement.innerHTML = `
                     <input type="checkbox" class="service-checkbox" ${service.completed ? 'checked' : ''}>
-                    <span class="service-text">${service.text}</span>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBI Client Checklist</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #e0e0e0;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        body.rtl {
+            direction: rtl;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .app-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .mbi-brand {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        body.rtl .mbi-brand {
+            left: auto;
+            right: 25px;
+        }
+        
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        body.rtl .lang-toggle {
+            right: auto;
+            left: 25px;
+        }
+        
+        .lang-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin: 15px 0 10px;
+        }
+        
+        .app-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .client-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            padding: 30px;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        @media (max-width: 650px) {
+            .client-info {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .services-section {
+            padding: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--text);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        body.rtl .section-title::after {
+            left: auto;
+            right: 0;
+        }
+        
+        .task-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        body.rtl .task-input-group {
+            flex-direction: row-reverse;
+        }
+        
+        #taskInput {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.05rem;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+        
+        .services-list {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            background: var(--light);
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .service-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        body.rtl .service-item {
+            border-left: none;
+            border-right: 4px solid var(--secondary);
+        }
+        
+        .service-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        body.rtl .service-item:hover {
+            transform: translateX(-5px);
+        }
+        
+        .service-checkbox {
+            margin-right: 18px;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: var(--secondary);
+        }
+        
+        body.rtl .service-checkbox {
+            margin-right: 0;
+            margin-left: 18px;
+        }
+        
+        .service-text {
+            flex: 1;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+        
+        .service-item.completed .service-text {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+        
+        .service-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.3rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px;
+            background: var(--light);
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 650px) {
+            .action-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+        
+        .counter {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        body.rtl .counter {
+            margin-left: 0;
+            margin-right: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .pwa-notice {
+            text-align: center;
+            padding: 15px;
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .pwa-notice a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .pwa-notice a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="mbi-brand">MBI</div>
+            <button id="langBtn" class="lang-toggle">العربية</button>
+            <h1 id="appTitle">Client Checklist</h1>
+            <p id="appSubtitle" class="app-subtitle">Professional client services management</p>
+        </div>
+        
+        <div class="client-info">
+            <div class="form-group">
+                <label id="nameLabel">Client Name</label>
+                <input type="text" id="clientName" placeholder="Enter client name" value="Omar">
+            </div>
+            <div class="form-group">
+                <label id="phoneLabel">Phone Number</label>
+                <input type="text" id="clientNumber" placeholder="Enter phone number" value="081292906570">
+            </div>
+        </div>
+        
+        <div class="services-section">
+            <h2 class="section-title">
+                <span id="servicesTitle">Services</span>
+                <span id="serviceCounter" class="counter">4</span>
+            </h2>
+            
+            <div class="task-input-group">
+                <input type="text" id="taskInput" placeholder="Enter service name">
+                <button id="addBtn" class="btn btn-primary">
+                    <span id="addBtnText">Add Service</span>
+                </button>
+            </div>
+            
+            <div id="services" class="services-list">
+                <div class="service-item">
+                    <input type="checkbox" class="service-checkbox">
+                    <span class="service-text">Visa Processed</span>
                     <div class="service-actions">
-                        <button class="delete-btn" onclick="deleteService(this)">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <button class="delete-btn">✕</button>
+                    </div>
+                </div>
+                <div class="service-item completed">
+                    <input type="checkbox" class="service-checkbox" checked>
+                    <span class="service-text">Hotel Booked</span>
+                    <div class="service-actions">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                </div>
+                <div class="service-item completed">
+                    <input type="checkbox" class="service-checkbox" checked>
+                    <span class="service-text">Flight Ticket Confirmed</span>
+                    <div class="service-actions">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                </div>
+                <div class="service-item completed">
+                    <input type="checkbox" class="service-checkbox" checked>
+                    <span class="service-text">Travel Insurance Added</span>
+                    <div class="service-actions">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="saveBtn" class="btn btn-success">
+                <span id="saveBtnText">Save as PDF</span>
+            </button>
+            <button id="clearBtn" class="btn btn-danger">
+                <span id="clearBtnText">Clear All</span>
+            </button>
+        </div>
+        
+        <div class="pwa-notice">
+            <span id="pwaText">Install this app on your home screen for quick access</span>
+        </div>
+    </div>
+
+    <script>
+        // Language state (false = English, true = Arabic)
+        let isArabic = false;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners
+            document.getElementById('addBtn').addEventListener('click', addService);
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+            document.getElementById('saveBtn').addEventListener('click', saveAsPDF);
+            document.getElementById('langBtn').addEventListener('click', toggleLang);
+            
+            // Allow adding services with Enter key
+            document.getElementById('taskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addService();
+                }
+            });
+            
+            // Set up event listeners for service items
+            document.querySelectorAll('.service-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const item = this.closest('.service-item');
+                    item.classList.toggle('completed', this.checked);
+                });
+            });
+            
+            // Set up delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const item = this.closest('.service-item');
+                    item.remove();
+                    updateCounter();
+                });
+            });
+        });
+        
+        // Add a new service
+        function addService() {
+            const taskInput = document.getElementById('taskInput');
+            const servicesContainer = document.getElementById('services');
+            
+            if (taskInput.value.trim()) {
+                const serviceElement = document.createElement('div');
+                serviceElement.className = 'service-item';
+                serviceElement.innerHTML = `
+                    <input type="checkbox" class="service-checkbox">
+                    <span class="service-text">${taskInput.value}</span>
+                    <div class="service-actions">
+                        <button class="delete-btn">✕</button>
                     </div>
                 `;
                 
                 servicesContainer.appendChild(serviceElement);
                 
-                // Add event listener to the checkbox
-                const checkbox = serviceElement.querySelector('.service-checkbox');
-                checkbox.addEventListener('change', function() {
+                // Add event listeners to new elements
+                serviceElement.querySelector('.service-checkbox').addEventListener('change', function() {
                     serviceElement.classList.toggle('completed', this.checked);
+                });
+                
+                serviceElement.querySelector('.delete-btn').addEventListener('click', function() {
+                    serviceElement.remove();
                     updateCounter();
                 });
-            });
-            
+                
+                taskInput.value = '';
+                updateCounter();
+            }
+        }
+        
+        // Delete a service
+        function deleteService(button) {
+            const serviceItem = button.closest('.service-item');
+            serviceItem.remove();
             updateCounter();
         }
         
@@ -469,6 +1000,49 @@
         
         // Clear all services
         function clearAll() {
+            if (confirm(isArabic ? 'هل أنت متأكد أنك تريد مسح جميع الخدمات؟' : 'Are you sure you want to clear all services?')) {
+                document.getElementById('services').innerHTML = '';
+                updateCounter();
+            }
+        }
+        
+        // Save as PDF
+        function saveAsPDF() {
+            const clientName = document.getElementById('clientName').value || 'client';
+            alert(`${isArabic ? 'جارٍ حفظ ملف PDF باسم' : 'Saving PDF as'} ${clientName}-checklist.pdf`);
+            // Actual PDF generation would be implemented here
+        }
+        
+        // Toggle language
+        function toggleLang() {
+            isArabic = !isArabic;
+            document.body.classList.toggle('rtl', isArabic);
+            document.getElementById('langBtn').textContent = isArabic ? 'English' : 'العربية';
+            
+            if (isArabic) {
+                // Arabic translations
+                document.getElementById("appTitle").textContent = "قائمة العملاء";
+                document.getElementById("appSubtitle").textContent = "إدارة خدمات العملاء المحترفة";
+                document.getElementById("nameLabel").textContent = "اسم العميل";
+                document.getElementById("phoneLabel").textContent = "رقم الهاتف";
+                document.getElementById("clientName").placeholder = "أدخل اسم العميل";
+                document.getElementById("clientNumber").placeholder = "أدخل رقم الهاتف";
+                document.getElementById("servicesTitle").textContent = "الخدمات";
+                document.getElementById("taskInput").placeholder = "أدخل اسم الخدمة";
+                document.getElementById("addBtnText").textContent = "إضافة خدمة";
+                document.getElementById("saveBtnText").textContent = "حفظ كـ PDF";
+                document.getElementById("clearBtnText").textContent = "مسح الكل";
+                document.getElementById("pwaText").textContent = "ثبّت هذا التطبيق على شاشتك الرئيسية للوصول السريع";
+            } else {
+                // English translations
+                document.getElementById("appTitle").textContent = "Client Checklist";
+                document.getElementById("appSubtitle").textContent = "Professional client services management";
+                document.getElementById("nameLabel").textContent = "Client Name";
+                document.getElementById("phoneLabel").textContent = "Phone Number";
+                document.getElementById("clientName").placeholder = "Enter client name";
+                document.getElementById("clientNumber").placeholder = "Enter phone number";
+                document.getElementById("servicesTitle").textContent = "Services";
+              function clearAll() {
             if (confirm('Are you sure you want to clear all services?')) {
                 document.getElementById('services').innerHTML = '';
                 updateCounter();

@@ -171,89 +171,198 @@
     ];
 
     function renderTasks() {
-      checklistEl.innerHTML = "";
-      tasks.forEach((task, index) => {
-        const item = document.createElement("div");
-        item.className = "checklist-item";
-        item.innerHTML = `
-          <div>
-            <input type="checkbox" id="task-${index}">
-            <label for="task-${index}">${task}</label>
-          </div>
-          <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
-        `;
-        checklistEl.appendChild(item);
-      });
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Checklist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f6f9;
+      color: #333;
     }
-
-    function addTask() {
-      const newTask = newTaskInput.value.trim();
-      if (newTask) {
-        tasks.push(newTask);
-        newTaskInput.value = "";
-        renderTasks();
-      }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
     }
-
-    function deleteTask(index) {
-      tasks.splice(index, 1);
-      renderTasks();
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      color: #34495e;
     }
-
-    function clearAll() {
-      if (confirm("Are you sure you want to clear all tasks?")) {
-        tasks = [];
-        renderTasks();
-      }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
-
-    function savePDF() {
-      const element = document.createElement("div");
-      const clientName = document.getElementById("clientName").value;
-      const clientNumber = document.getElementById("clientNumber").value;
-
-      element.innerHTML = `
-        <h2>Client Checklist</h2>
-        <p><strong>Client Name:</strong> ${clientName}</p>
-        <p><strong>Client Number:</strong> ${clientNumber}</p>
-        <ul>
-          ${tasks.map((t, i) => {
-            const checked = document.getElementById("task-" + i)?.checked ? "✅" : "❌";
-            return `<li>${checked} ${t}</li>`;
-          }).join("")}
-        </ul>
-      `;
-
-      html2pdf().from(element).save(`${clientName || "checklist"}.pdf`);
+    .checklist {
+      margin: 20px 0;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     }
-
-    renderTasks();
-
-    // PWA service worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch(err => console.log("SW registration failed", err));
+    .task {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px;
+      margin: 5px 0;
+      border-bottom: 1px solid #eee;
     }
-  </script>
-</body>
-</html>   <label><input type="checkbox" checked> Hotel Booked</label>
-      <label><input type="checkbox" checked> Flight Ticket Confirmed</label>
-      <label><input type="checkbox" checked> Travel Insurance Added</label>
+    .task:last-child {
+      border-bottom: none;
+    }
+    .task label {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    .task input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+    .task button {
+      background-color: #7f8c8d;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .task button:hover {
+      background-color: #95a5a6;
+    }
+    .btn {
+      margin: 10px 5px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .add-btn {
+      background-color: #3498db;
+    }
+    .add-btn:hover {
+      background-color: #2980b9;
+    }
+    .save-btn {
+      background-color: #27ae60;
+    }
+    .save-btn:hover {
+      background-color: #1e8449;
+    }
+    .clear-btn {
+      background-color: #e74c3c;
+    }
+    .clear-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <h2>Client Checklist</h2>
+
+  <label for="clientName">Client Name:</label>
+  <input type="text" id="clientName" placeholder="Enter client name">
+
+  <label for="clientNumber">Client Number:</label>
+  <input type="text" id="clientNumber" placeholder="Enter client number">
+
+  <div class="checklist" id="checklist">
+    <div class="task">
+      <label><input type="checkbox"> Website Design</label>
+      <button onclick="deleteTask(this)">Delete</button>
+    </div>
+    <div class="task">
+      <label><input type="checkbox"> Hosting Setup</label>
+      <button onclick="deleteTask(this)">Delete</button>
+    </div>
+    <div class="task">
+      <label><input type="checkbox"> Domain Purchase</label>
+      <button onclick="deleteTask(this)">Delete</button>
+    </div>
+    <div class="task">
+      <label><input type="checkbox"> SEO Optimization</label>
+      <button onclick="deleteTask(this)">Delete</button>
+    </div>
+    <div class="task">
+      <label><input type="checkbox"> Client Training</label>
+      <button onclick="deleteTask(this)">Delete</button>
     </div>
   </div>
 
-  <button onclick="downloadPDF()">📥 Save as PDF</button>
+  <label for="newTask">Add New Task:</label>
+  <input type="text" id="newTask" placeholder="Enter task name">
+  <button class="btn add-btn" onclick="addTask()">Add Task</button>
+  <br>
+  <button class="btn save-btn" onclick="savePDF()">Save as PDF</button>
+  <button class="btn clear-btn" onclick="clearAll()">Clear All</button>
 
-  <!-- jsPDF & html2canvas for PDF generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <script>
-    async function downloadPDF() {
-      const { jsPDF } = window.jspdf;
+    function deleteTask(button) {
+      button.parentElement.remove();
+    }
+
+    function addTask() {
+      const taskName = document.getElementById("newTask").value;
+      if (taskName.trim() === "") return;
+
       const checklist = document.getElementById("checklist");
+      const div = document.createElement("div");
+      div.className = "task";
+      div.innerHTML = `
+        <label><input type="checkbox"> ${taskName}</label>
+        <button onclick="deleteTask(this)">Delete</button>
+      `;
+      checklist.appendChild(div);
+      document.getElementById("newTask").value = "";
+    }
+
+    async function savePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const clientName = document.getElementById("clientName").value;
+      const clientNumber = document.getElementById("clientNumber").value;
+
+      doc.setFontSize(16);
+      doc.text("Client Checklist", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Client Name: ${clientName}`, 20, 30);
+      doc.text(`Client Number: ${clientNumber}`, 20, 40);
+
+      let y = 60;
+      document.querySelectorAll(".task label").forEach((task) => {
+        const checkbox = task.querySelector("input");
+        const text = task.innerText.trim();
+        const status = checkbox.checked ? "[✔]" : "[ ]";
+        doc.text(`${status} ${text}`, 20, y);
+        y += 10;
+      });
+
+      doc.save("checklist.pdf");
+    }
+
+    function clearAll() {
+      document.getElementById("checklist").innerHTML = "";
+    }
+  </script>
+</body>
+</html>ementById("checklist");
 
       // Convert to canvas
       const canvas = await html2canvas(checklist);

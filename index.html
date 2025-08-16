@@ -1,152 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <title>Client Checklist</title>
-    <!-- Include jsPDF library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-        .rtl {
-            direction: rtl;
-            text-align: right;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px 0;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            cursor: pointer;
-            background: #4CAF50;
-            color: white;
-            border: none;
-        }
-        #tasks {
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            padding: 10px;
-            min-height: 100px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Checklist</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f6fa;
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      color: white;
+    }
+    .blue-btn { background: #007bff; }
+    .red-btn { background: #dc3545; }
+    .grey-btn { background: grey; }
+    .task {
+      margin-top: 10px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 4%;
+    }
+    #langToggle {
+      display: block;
+      margin: 10px auto;
+      background: #28a745;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="title">Client Checklist</h1>
-        
-        <label id="nameLabel">Client Name</label>
-        <input type="text" id="clientName" placeholder="Enter client name">
-        
-        <label id="numberLabel">Client Number</label>
-        <input type="text" id="clientNumber" placeholder="Enter client number">
-        
-        <label id="taskLabel">Add New Task</label>
-        <input type="text" id="taskInput" placeholder="Enter task name">
-        <button id="addBtn">Add Task</button>
-        
-        <div id="tasks"></div>
-        
-        <button id="saveBtn">Save as PDF</button>
-        <button id="clearBtn">Clear All</button>
-        <button id="langBtn">العربية</button>
-    </div>
+  <h2 id="title">Client Checklist</h2>
 
-    <script>
-        // Global language state
-        let isArabic = false;
-        
-        // Initialize
-        document.getElementById('addBtn').addEventListener('click', addTask);
-        document.getElementById('clearBtn').addEventListener('click', clearAll);
-        document.getElementById('saveBtn').addEventListener('click', saveAsPDF);
-        document.getElementById('langBtn').addEventListener('click', toggleLang);
+  <button id="langToggle" onclick="toggleLanguage()">🇬🇧 English</button>
 
-        function addTask() {
-            const taskInput = document.getElementById('taskInput');
-            const tasksContainer = document.getElementById('tasks');
-            
-            if (taskInput.value.trim()) {
-                const taskElement = document.createElement('div');
-                taskElement.textContent = taskInput.value;
-                tasksContainer.appendChild(taskElement);
-                taskInput.value = '';
-            }
-        }
+  <label id="lblName" for="clientName">Client Name:</label>
+  <input type="text" id="clientName" placeholder="Enter client name">
 
-        function clearAll() {
-            document.getElementById('tasks').innerHTML = '';
-            document.getElementById('clientName').value = '';
-            document.getElementById('clientNumber').value = '';
-            document.getElementById('taskInput').value = '';
-        }
+  <label id="lblNumber" for="clientNumber">Client Number:</label>
+  <input type="text" id="clientNumber" placeholder="Enter client number">
 
-        function saveAsPDF() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF("p", "mm", "a4");
-            
-            // Create temporary canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 800;
-            canvas.height = 1000;
-            
-            // Draw content on canvas
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#000000';
-            ctx.font = '16px Arial';
-            ctx.fillText(document.getElementById('title').textContent, 50, 50);
-            
-            // Convert to image
-            const imgData = canvas.toDataURL("image/png");
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-            pdf.save("client-checklist.pdf");
-        }
+  <label id="lblTask" for="task">Add New Task:</label>
+  <input type="text" id="task" placeholder="Enter task name">
+  <button id="btnAdd" class="blue-btn" onclick="addTask()">Add Task</button>
 
-        function toggleLang() {
-            isArabic = !isArabic;
-            
-            if (isArabic) {
-                document.getElementById("title").textContent = "قائمة العملاء";
-                document.getElementById("nameLabel").textContent = "اسم العميل";
-                document.getElementById("numberLabel").textContent = "رقم العميل";
-                document.getElementById("taskLabel").textContent = "إضافة مهمة جديدة";
-                document.getElementById("clientName").placeholder = "أدخل اسم العميل";
-                document.getElementById("clientNumber").placeholder = "أدخل رقم العميل";
-                document.getElementById("taskInput").placeholder = "أدخل اسم المهمة";
-                document.getElementById("addBtn").textContent = "إضافة مهمة";
-                document.getElementById("saveBtn").textContent = "حفظ كـ PDF";
-                document.getElementById("clearBtn").textContent = "مسح الكل";
-                document.getElementById("langBtn").textContent = "English";
-                document.body.classList.add('rtl');
-            } else {
-                document.getElementById("title").textContent = "Client Checklist";
-                document.getElementById("nameLabel").textContent = "Client Name";
-                document.getElementById("numberLabel").textContent = "Client Number";
-                document.getElementById("taskLabel").textContent = "Add New Task";
-                document.getElementById("clientName").placeholder = "Enter client name";
-                document.getElementById("clientNumber").placeholder = "Enter client number";
-                document.getElementById("taskInput").placeholder = "Enter task name";
-                document.getElementById("addBtn").textContent = "Add Task";
-                document.getElementById("saveBtn").textContent = "Save as PDF";
-                document.getElementById("clearBtn").textContent = "Clear All";
-                document.getElementById("langBtn").textContent = "العربية";
-                document.body.classList.remove('rtl');
-            }
-        }
-    </script>
+  <div id="checklist"></div>
+
+  <div class="btn-group">
+    <button id="btnSave" class="blue-btn" onclick="savePDF()">Save as PDF</button>
+    <button id="btnClear" class="red-btn" onclick="clearAll()">Clear All</button>
+  </div>
+
+  <script>
+    let isArabic = false;
+
+    function addTask() {
+      const taskInput = document.getElementById("task");
+      const taskValue = taskInput.value.trim();
+      if (taskValue === "") return;
+
+      const taskDiv = document.createElement("div");
+      taskDiv.className = "task";
+      taskDiv.innerHTML = `
+        <span>${taskValue}</span>
+        <button class="grey-btn" onclick="this.parentElement.remove()">
+          ${isArabic ? "حذف" : "Delete"}
+        </button>
+      `;
+      document.getElementById("checklist").appendChild(taskDiv);
+      taskInput.value = "";
+    }
+
+    async function savePDF() {
+      const { jsPDF } = window.jspdf;
+      const checklist = document.getElementById("checklist");
+
+      const canvas = await html2canvas(checklist);
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("client-checklist.pdf");
+    }
+
+    function clearAll() {
+      document.getElementById("clientName").value = "";
+      document.getElementById("clientNumber").value = "";
+      document.getElementById("task").value = "";
+      document.getElementById("checklist").innerHTML = "";
+    }
+
+    function toggleLanguage() {
+      isArabic = !isArabic;
+      document.documentElement.dir = isArabic ? "rtl" : "ltr";
+      document.getElementById("title").textContent = isArabic ? "قائمة فحص العميل" : "Client Checklist";
+      document.getElementById("lblName").textContent = isArabic ? "اسم العميل:" : "Client Name:";
+      document.getElementById("lblNumber").textContent = isArabic ? "رقم العميل:" : "Client Number:";
+      document.getElementById("lblTask").textContent = isArabic ? "إضافة مهمة جديدة:" : "Add New Task:";
+      document.getElementById("task").placeholder = isArabic ? "أدخل اسم المهمة" : "Enter task name";
+      document.getElementById("clientName").placeholder = isArabic ? "أدخل اسم العميل" : "Enter client name";
+      document.getElementById("clientNumber").placeholder = isArabic ? "أدخل رقم العميل" : "Enter client number";
+      document.getElementById("btnAdd").textContent = isArabic ? "إضافة" : "Add Task";
+      document.getElementById("btnSave").textContent = isArabic ? "حفظ كملف PDF" : "Save as PDF";
+      document.getElementById("btnClear").textContent = isArabic ? "مسح الكل" : "Clear All";
+      document.getElementById("langToggle").textContent = isArabic ? "🇸🇦 العربية" : "🇬🇧 English";
+
+      // Update existing task delete buttons
+      document.querySelectorAll(".task .grey-btn").forEach(btn => {
+        btn.textContent = isArabic ? "حذف" : "Delete";
+      });
+    }
+  </script>
 </body>
 </html>

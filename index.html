@@ -6,114 +6,127 @@
   <title>Client Checklist</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: #f0f2f5;
       margin: 0;
       padding: 20px;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
+
     .container {
       background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      max-width: 450px;
+      padding: 25px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       width: 100%;
+      max-width: 420px;
+      animation: fadeIn 0.5s ease-in-out;
     }
-    h1 {
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
       text-align: center;
-      font-size: 1.5rem;
-      margin-bottom: 15px;
       color: #333;
+      margin-bottom: 20px;
     }
+
     label {
-      font-size: 0.9rem;
-      color: #555;
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #444;
     }
-    input, textarea {
+
+    input[type="text"], input[type="tel"] {
       width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      margin-bottom: 15px;
+      padding: 10px 12px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      margin-bottom: 15px;
+      transition: all 0.2s ease;
     }
-    .checklist {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 20px 0;
+
+    input[type="text"]:focus, input[type="tel"]:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
     }
-    .checklist li {
-      margin-bottom: 10px;
+
+    .checkbox-group {
+      margin-bottom: 15px;
+    }
+
+    .checkbox-group label {
       display: flex;
       align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      cursor: pointer;
     }
-    .checklist input {
+
+    .checkbox-group input {
       margin-right: 10px;
+      transform: scale(1.2);
     }
+
     button {
       width: 100%;
       padding: 12px;
-      background: #28a745;
+      background: #4CAF50;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
       border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 1rem;
+      border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.1s;
     }
+
     button:hover {
-      background: #218838;
+      background: #43a047;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    footer {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Client Checklist</h1>
-    <form id="clientForm">
-      <label for="name">Client Name:</label>
-      <input type="text" id="name" name="name" placeholder="Enter client name" required>
+    <h2>📝 Client Checklist</h2>
+    
+    <form>
+      <label for="clientName">Client Name</label>
+      <input type="text" id="clientName" name="clientName" placeholder="Enter client name" required>
 
-      <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" placeholder="Enter phone number" required>
+      <label for="phoneNumber">Phone Number</label>
+      <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" required>
 
-      <ul class="checklist">
-        <li><input type="checkbox" id="offer1"> <label for="offer1">Package A Accepted</label></li>
-        <li><input type="checkbox" id="offer2"> <label for="offer2">Package B Accepted</label></li>
-        <li><input type="checkbox" id="offer3"> <label for="offer3">Custom Request Confirmed</label></li>
-      </ul>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="packageA"> Package A Accepted</label>
+        <label><input type="checkbox" name="packageB"> Package B Accepted</label>
+        <label><input type="checkbox" name="customRequest"> Custom Request Confirmed</label>
+      </div>
 
-      <button type="button" onclick="saveData()">Save</button>
+      <button type="submit">💾 Save</button>
     </form>
+
+    <footer>© 2025 Client Manager</footer>
   </div>
-
-  <script>
-    function saveData() {
-      const client = {
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        offer1: document.getElementById("offer1").checked,
-        offer2: document.getElementById("offer2").checked,
-        offer3: document.getElementById("offer3").checked
-      };
-
-      localStorage.setItem("clientData", JSON.stringify(client));
-      alert("✅ Saved successfully!");
-    }
-
-    // Load saved data
-    window.onload = () => {
-      const saved = localStorage.getItem("clientData");
-      if (saved) {
-        const client = JSON.parse(saved);
-        document.getElementById("name").value = client.name || "";
-        document.getElementById("phone").value = client.phone || "";
-        document.getElementById("offer1").checked = client.offer1 || false;
-        document.getElementById("offer2").checked = client.offer2 || false;
-        document.getElementById("offer3").checked = client.offer3 || false;
-      }
-    };
-  </script>
 </body>
 </html>

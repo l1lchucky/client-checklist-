@@ -20,113 +20,91 @@
       background: #fff;
       padding: 25px 30px;
       border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 420px;
-      animation: fadeIn 0.5s ease-in-out;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Checklist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+      margin: 0;
     }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
     h2 {
       text-align: center;
-      color: #333;
       margin-bottom: 20px;
     }
-
     label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: #444;
+      margin: 12px 0;
     }
-
     input[type="text"], input[type="tel"] {
       width: 100%;
-      padding: 10px 12px;
+      padding: 10px;
+      margin-top: 6px;
       border: 1px solid #ccc;
-      border-radius: 10px;
-      outline: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-      transition: all 0.2s ease;
-    }
-
-    input[type="text"]:focus, input[type="tel"]:focus {
-      border-color: #4CAF50;
-      box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
-    }
-
-    .checkbox-group {
-      margin-bottom: 15px;
-    }
-
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .checkbox-group input {
-      margin-right: 10px;
-      transform: scale(1.2);
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #4CAF50;
-      color: #fff;
+      border-radius: 6px;
       font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.1s;
     }
-
-    button:hover {
-      background: #43a047;
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 8px;
     }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    footer {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 12px;
-      color: #888;
+    h3 {
+      margin-top: 20px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>📝 Client Checklist</h2>
-    
-    <form>
-      <label for="clientName">Client Name</label>
-      <input type="text" id="clientName" name="clientName" placeholder="Enter client name" required>
+    <h2>Client Checklist</h2>
 
-      <label for="phoneNumber">Phone Number</label>
-      <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" required>
+    <label>Client Name:
+      <input type="text" id="clientName" placeholder="Enter client name">
+    </label>
+    <label>Phone Number:
+      <input type="tel" id="clientPhone" placeholder="Enter phone number">
+    </label>
 
-      <div class="checkbox-group">
-        <label><input type="checkbox" name="packageA"> Package A Accepted</label>
-        <label><input type="checkbox" name="packageB"> Package B Accepted</label>
-        <label><input type="checkbox" name="customRequest"> Custom Request Confirmed</label>
-      </div>
-
-      <button type="submit">💾 Save</button>
-    </form>
-
-    <footer>© 2025 Client Manager</footer>
+    <h3>Services</h3>
+    <label><input type="checkbox" name="visa"> Visa Processed</label>
+    <label><input type="checkbox" name="hotel"> Hotel Booked</label>
+    <label><input type="checkbox" name="flight"> Flight Ticket Confirmed</label>
+    <label><input type="checkbox" name="insurance"> Travel Insurance Added</label>
   </div>
+
+  <script>
+    // Load saved data
+    window.onload = function() {
+      document.querySelectorAll("input").forEach(input => {
+        if (input.type === "checkbox") {
+          input.checked = localStorage.getItem(input.name) === "true";
+        } else {
+          input.value = localStorage.getItem(input.id) || "";
+        }
+
+        input.addEventListener("input", () => {
+          if (input.type === "checkbox") {
+            localStorage.setItem(input.name, input.checked);
+          } else {
+            localStorage.setItem(input.id, input.value);
+          }
+        });
+      });
+    };
+  </script>
 </body>
 </html>

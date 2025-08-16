@@ -420,15 +420,496 @@
         // Save as PDF
         function saveAsPDF() {
             const { jsPDF } = window.jspdf;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Checklist</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 5px solid #3498db;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .client-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .services-section {
+            padding: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: #2c3e50;
+        }
+        
+        .task-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        #taskInput {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.05rem;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+        
+        .services-list {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .service-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+        
+        .service-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .service-checkbox {
+            margin-right: 18px;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #3498db;
+        }
+        
+        .service-text {
+            flex: 1;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .service-item.completed .service-text {
+            text-decoration: line-through;
+            color: #7f8c8d;
+        }
+        
+        .service-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.3rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 650px) {
+            .client-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+        
+        .counter {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .service-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .status-pending {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+        }
+        
+        .status-completed {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Client Checklist</h1>
+        </header>
+        
+        <div class="client-info">
+            <div class="form-group">
+                <label for="clientName">Client Name</label>
+                <input type="text" id="clientName" placeholder="Enter client name" value="Omar">
+            </div>
+            <div class="form-group">
+                <label for="clientNumber">Phone Number</label>
+                <input type="text" id="clientNumber" placeholder="Enter phone number" value="081292906570">
+            </div>
+        </div>
+        
+        <div class="services-section">
+            <h2 class="section-title">Services <span id="serviceCounter" class="counter">0</span></h2>
+            
+            <div class="task-input-group">
+                <input type="text" id="taskInput" placeholder="Enter service name">
+                <button id="addBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Service
+                </button>
+            </div>
+            
+            <div id="services" class="services-list">
+                <!-- Services will be added here -->
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="saveBtn" class="btn btn-secondary">
+                <i class="fas fa-file-pdf"></i> Save as PDF
+            </button>
+            <button id="clearBtn" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Clear All
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Font Awesome for icons
+        const fontAwesome = document.createElement('link');
+        fontAwesome.rel = 'stylesheet';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(fontAwesome);
+        
+        // Initial services data
+        const initialServices = [
+            { text: "Visa Processed", completed: false },
+            { text: "Hotel Booked", completed: true },
+            { text: "Flight Ticket Confirmed", completed: true },
+            { text: "Travel Insurance Added", completed: true }
+        ];
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners
+            document.getElementById('addBtn').addEventListener('click', addService);
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+            document.getElementById('saveBtn').addEventListener('click', saveAsPDF);
+            
+            // Allow adding services with Enter key
+            document.getElementById('taskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addService();
+                }
+            });
+            
+            // Load initial services
+            loadInitialServices();
+        });
+        
+        // Add a new service
+        function addService() {
+            const taskInput = document.getElementById('taskInput');
+            const servicesContainer = document.getElementById('services');
+            
+            if (taskInput.value.trim()) {
+                // Create service element
+                const serviceElement = document.createElement('div');
+                serviceElement.className = 'service-item';
+                serviceElement.innerHTML = `
+                    <input type="checkbox" class="service-checkbox">
+                    <span class="service-text">${taskInput.value}</span>
+                    <div class="service-actions">
+                        <button class="delete-btn" onclick="deleteService(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                servicesContainer.appendChild(serviceElement);
+                
+                // Add event listener to the checkbox
+                const checkbox = serviceElement.querySelector('.service-checkbox');
+                checkbox.addEventListener('change', function() {
+                    serviceElement.classList.toggle('completed', this.checked);
+                    updateCounter();
+                });
+                
+                // Clear input
+                taskInput.value = '';
+                taskInput.focus();
+                
+                // Update counter
+                updateCounter();
+            }
+        }
+        
+        // Delete a service
+        function deleteService(button) {
+            const serviceItem = button.closest('.service-item');
+            serviceItem.remove();
+            updateCounter();
+        }
+        
+        // Load initial services
+        function loadInitialServices() {
+            const servicesContainer = document.getElementById('services');
+            
+            initialServices.forEach(service => {
+                const serviceElement = document.createElement('div');
+                serviceElement.className = `service-item ${service.completed ? 'completed' : ''}`;
+                serviceElement.innerHTML = `
+                    <input type="checkbox" class="service-checkbox" ${service.completed ? 'checked' : ''}>
+                    <span class="service-text">${service.text}</span>
+                    <div class="service-actions">
+                        <button class="delete-btn" onclick="deleteService(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                servicesContainer.appendChild(serviceElement);
+                
+                // Add event listener to the checkbox
+                const checkbox = serviceElement.querySelector('.service-checkbox');
+                checkbox.addEventListener('change', function() {
+                    serviceElement.classList.toggle('completed', this.checked);
+                    updateCounter();
+                });
+            });
+            
+            updateCounter();
+        }
+        
+        // Update service counter
+        function updateCounter() {
+            const services = document.querySelectorAll('.service-item');
+            document.getElementById('serviceCounter').textContent = services.length;
+        }
+        
+        // Clear all services
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all services?')) {
+                document.getElementById('services').innerHTML = '';
+                updateCounter();
+            }
+        }
+        
+        // Save as PDF
+        function saveAsPDF() {
+            const { jsPDF } = window.jspdf;
             
             // Get the container element
             const element = document.querySelector('.container');
             
             // Use html2canvas to capture the element as an image
             html2canvas(element, {
-                scale: 2, // Higher quality
+                scale: 2,
                 useCORS: true,
-                logging: false
+                logging: false,
+                backgroundColor: "#ffffff"
             }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF('p', 'mm', 'a4');
@@ -444,10 +925,9 @@
                 pdf.save(`${clientName}-checklist.pdf`);
             });
         }
-        
-        // Toggle language
-        function toggleLang() {
-            isArabic = !isArabic;
+    </script>
+</body>
+</html>abic;
             
             if (isArabic) {
                 // Arabic translations

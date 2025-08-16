@@ -69,28 +69,108 @@
   <script>
     let isArabic = false;
 
-    function addTask() {
-      const taskInput = document.getElementById("taskInput");
-      if (taskInput.value.trim() !== "") {
-        const li = document.createElement("li");
-        li.textContent = taskInput.value;
-        document.getElementById("taskList").appendChild(li);
-        taskInput.value = "";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Checklist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .checklist {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .checklist-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+    button {
+      padding: 6px 12px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .language-toggle {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Client Checklist</h1>
+
+  <div class="language-toggle">
+    <button onclick="toggleLanguage()">Switch Language</button>
+  </div>
+
+  <div class="checklist">
+    <div class="checklist-item">
+      <span id="item1">Item 1</span>
+      <button onclick="markDone('item1')">Done</button>
+    </div>
+    <div class="checklist-item">
+      <span id="item2">Item 2</span>
+      <button onclick="markDone('item2')">Done</button>
+    </div>
+    <div class="checklist-item">
+      <span id="item3">Item 3</span>
+      <button onclick="markDone('item3')">Done</button>
+    </div>
+  </div>
+
+  <script>
+    let rentLang = "en";
+
+    function toggleLanguage() {
+      if (rentLang === "en") {
+        document.getElementById('item1').innerText = 'البند 1';
+        document.getElementById('item2').innerText = 'البند 2';
+        document.getElementById('item3').innerText = 'البند 3';
+        rentLang = "ar";
+      } else {
+        document.getElementById('item1').innerText = 'Item 1';
+        document.getElementById('item2').innerText = 'Item 2';
+        document.getElementById('item3').innerText = 'Item 3';
+        rentLang = "en";
       }
     }
 
-    function clearAll() {
-      document.getElementById("clientName").value = "";
-      document.getElementById("clientNumber").value = "";
-      document.getElementById("taskInput").value = "";
-      document.getElementById("taskList").innerHTML = "";
+    function markDone(itemId) {
+      const el = document.getElementById(itemId);
+      el.style.textDecoration = "line-through";
+      el.style.color = "gray";
     }
+  </script>
 
-    async function savePDF() {
-      const { jsPDF } = window.jspdf;
-      const checklist = document.body;
-      const canvas = await html2canvas(checklist);
-      const imgData = canvas.toDataURL("image/png");
+</body>
+</html> imgData = canvas.toDataURL("image/png");
 
       const pdf = new jsPDF("p", "mm", "a4");
       const imgProps = pdf.getImageProperties(imgData);

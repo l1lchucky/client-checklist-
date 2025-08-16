@@ -2,124 +2,455 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Checklist</title>
-    <!-- Include jsPDF library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            transition: all 0.3s;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+        }
+        
+        .lang-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .lang-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .client-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="text"] {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .task-section {
+            padding: 20px;
+        }
+        
+        .task-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        #taskInput {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .tasks-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+        
+        .task-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .task-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .task-text {
+            flex: 1;
+            font-size: 1.05rem;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .btn-secondary {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-tertiary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-tertiary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
         .rtl {
             direction: rtl;
             text-align: right;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        
+        .rtl .task-item {
+            flex-direction: row-reverse;
         }
-        input, button {
-            padding: 10px;
-            margin: 5px 0;
-            width: 100%;
-            box-sizing: border-box;
+        
+        .rtl .task-checkbox {
+            margin-right: 0;
+            margin-left: 15px;
         }
-        button {
-            cursor: pointer;
-            background: #4CAF50;
-            color: white;
-            border: none;
+        
+        .rtl .delete-btn {
+            margin-left: 0;
+            margin-right: 10px;
         }
-        #tasks {
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            padding: 10px;
-            min-height: 100px;
+        
+        @media (max-width: 600px) {
+            .client-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="title">Client Checklist</h1>
+        <header>
+            <h1 id="title">Client Checklist</h1>
+            <button id="langBtn" class="lang-btn">العربية</button>
+        </header>
         
-        <label id="nameLabel">Client Name</label>
-        <input type="text" id="clientName" placeholder="Enter client name">
+        <div class="client-info">
+            <div class="form-group">
+                <label id="nameLabel">Client Name</label>
+                <input type="text" id="clientName" placeholder="Enter client name">
+            </div>
+            <div class="form-group">
+                <label id="numberLabel">Client Number</label>
+                <input type="text" id="clientNumber" placeholder="Enter client number">
+            </div>
+        </div>
         
-        <label id="numberLabel">Client Number</label>
-        <input type="text" id="clientNumber" placeholder="Enter client number">
+        <div class="task-section">
+            <div class="form-group">
+                <label id="taskLabel">Add New Task</label>
+                <div class="task-input-group">
+                    <input type="text" id="taskInput" placeholder="Enter task name">
+                    <button id="addBtn" class="btn btn-primary">Add Task</button>
+                </div>
+            </div>
+            
+            <div id="tasks" class="tasks-container">
+                <div class="empty-state" id="emptyState">No tasks added yet. Start by adding a new task.</div>
+            </div>
+        </div>
         
-        <label id="taskLabel">Add New Task</label>
-        <input type="text" id="taskInput" placeholder="Enter task name">
-        <button id="addBtn">Add Task</button>
-        
-        <div id="tasks"></div>
-        
-        <button id="saveBtn">Save as PDF</button>
-        <button id="clearBtn">Clear All</button>
-        <button id="langBtn">العربية</button>
+        <div class="action-buttons">
+            <button id="saveBtn" class="btn btn-tertiary">Save as PDF</button>
+            <button id="clearBtn" class="btn btn-secondary">Clear All</button>
+        </div>
     </div>
 
     <script>
         // Global language state
         let isArabic = false;
         
-        // Initialize
-        document.getElementById('addBtn').addEventListener('click', addTask);
-        document.getElementById('clearBtn').addEventListener('click', clearAll);
-        document.getElementById('saveBtn').addEventListener('click', saveAsPDF);
-        document.getElementById('langBtn').addEventListener('click', toggleLang);
-
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners
+            document.getElementById('addBtn').addEventListener('click', addTask);
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+            document.getElementById('saveBtn').addEventListener('click', saveAsPDF);
+            document.getElementById('langBtn').addEventListener('click', toggleLang);
+            
+            // Allow adding tasks with Enter key
+            document.getElementById('taskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+            
+            // Load tasks from localStorage if any
+            loadTasks();
+        });
+        
+        // Add a new task
         function addTask() {
             const taskInput = document.getElementById('taskInput');
             const tasksContainer = document.getElementById('tasks');
+            const emptyState = document.getElementById('emptyState');
             
             if (taskInput.value.trim()) {
+                // Hide empty state if visible
+                if (emptyState) emptyState.style.display = 'none';
+                
+                // Create task element
+                const taskId = 'task_' + Date.now();
                 const taskElement = document.createElement('div');
-                taskElement.textContent = taskInput.value;
+                taskElement.className = 'task-item';
+                taskElement.innerHTML = `
+                    <input type="checkbox" class="task-checkbox" id="${taskId}">
+                    <span class="task-text">${taskInput.value}</span>
+                    <div class="task-actions">
+                        <button class="delete-btn" onclick="deleteTask(this)">✕</button>
+                    </div>
+                `;
+                
                 tasksContainer.appendChild(taskElement);
+                
+                // Save to localStorage
+                saveTasks();
+                
+                // Clear input
                 taskInput.value = '';
+                taskInput.focus();
             }
         }
-
+        
+        // Delete a task
+        function deleteTask(button) {
+            const taskItem = button.closest('.task-item');
+            taskItem.remove();
+            
+            // Show empty state if no tasks left
+            if (document.querySelectorAll('.task-item').length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+            }
+            
+            // Update localStorage
+            saveTasks();
+        }
+        
+        // Clear all tasks and inputs
         function clearAll() {
-            document.getElementById('tasks').innerHTML = '';
+            const tasksContainer = document.getElementById('tasks');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Clear tasks
+            tasksContainer.innerHTML = '';
+            emptyState.style.display = 'block';
+            
+            // Clear inputs
             document.getElementById('clientName').value = '';
             document.getElementById('clientNumber').value = '';
             document.getElementById('taskInput').value = '';
+            
+            // Clear localStorage
+            localStorage.removeItem('clientChecklistTasks');
         }
-
+        
+        // Save tasks to localStorage
+        function saveTasks() {
+            const tasks = [];
+            document.querySelectorAll('.task-item').forEach(item => {
+                const text = item.querySelector('.task-text').textContent;
+                const checked = item.querySelector('.task-checkbox').checked;
+                tasks.push({ text, checked });
+            });
+            
+            localStorage.setItem('clientChecklistTasks', JSON.stringify(tasks));
+        }
+        
+        // Load tasks from localStorage
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('clientChecklistTasks'));
+            const tasksContainer = document.getElementById('tasks');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (tasks && tasks.length > 0) {
+                emptyState.style.display = 'none';
+                
+                tasks.forEach(task => {
+                    const taskId = 'task_' + Date.now() + Math.random();
+                    const taskElement = document.createElement('div');
+                    taskElement.className = 'task-item';
+                    taskElement.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" id="${taskId}" ${task.checked ? 'checked' : ''}>
+                        <span class="task-text">${task.text}</span>
+                        <div class="task-actions">
+                            <button class="delete-btn" onclick="deleteTask(this)">✕</button>
+                        </div>
+                    `;
+                    tasksContainer.appendChild(taskElement);
+                });
+            }
+        }
+        
+        // Save as PDF
         function saveAsPDF() {
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF("p", "mm", "a4");
             
-            // Create temporary canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 800;
-            canvas.height = 1000;
+            // Get the container element
+            const element = document.querySelector('.container');
             
-            // Draw content on canvas
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#000000';
-            ctx.font = '16px Arial';
-            ctx.fillText(document.getElementById('title').textContent, 50, 50);
-            
-            // Convert to image
-            const imgData = canvas.toDataURL("image/png");
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-            pdf.save("client-checklist.pdf");
+            // Use html2canvas to capture the element as an image
+            html2canvas(element, {
+                scale: 2, // Higher quality
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                
+                // Add image to PDF
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                // Save the PDF
+                const clientName = document.getElementById('clientName').value || 'client';
+                pdf.save(`${clientName}-checklist.pdf`);
+            });
         }
-
+        
+        // Toggle language
         function toggleLang() {
             isArabic = !isArabic;
             
             if (isArabic) {
+                // Arabic translations
                 document.getElementById("title").textContent = "قائمة العملاء";
                 document.getElementById("nameLabel").textContent = "اسم العميل";
                 document.getElementById("numberLabel").textContent = "رقم العميل";
@@ -131,8 +462,11 @@
                 document.getElementById("saveBtn").textContent = "حفظ كـ PDF";
                 document.getElementById("clearBtn").textContent = "مسح الكل";
                 document.getElementById("langBtn").textContent = "English";
+                
+                // Apply RTL styles
                 document.body.classList.add('rtl');
             } else {
+                // English translations
                 document.getElementById("title").textContent = "Client Checklist";
                 document.getElementById("nameLabel").textContent = "Client Name";
                 document.getElementById("numberLabel").textContent = "Client Number";
@@ -144,6 +478,8 @@
                 document.getElementById("saveBtn").textContent = "Save as PDF";
                 document.getElementById("clearBtn").textContent = "Clear All";
                 document.getElementById("langBtn").textContent = "العربية";
+                
+                // Remove RTL styles
                 document.body.classList.remove('rtl');
             }
         }

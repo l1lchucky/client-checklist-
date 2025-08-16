@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,6 +39,10 @@
       align-items: flex-start;
     }
     
+    body.rtl {
+      direction: rtl;
+    }
+    
     .container {
       background: white;
       width: 100%;
@@ -49,36 +53,30 @@
       transition: var(--transition);
     }
     
-    body.rtl {
-      direction: rtl;
-    }
-    
     .app-header {
       background: linear-gradient(to right, var(--primary), var(--primary-light));
       color: white;
-      padding: 25px 20px;
+      padding: 20px;
       text-align: center;
       position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-content {
+      flex: 1;
+      padding: 0 10px;
     }
     
     .mbi-brand {
-      position: absolute;
-      top: 20px;
-      left: 25px;
       font-size: 1.8rem;
       font-weight: bold;
       letter-spacing: 1px;
-    }
-    
-    body.rtl .mbi-brand {
-      left: auto;
-      right: 25px;
+      min-width: 60px;
     }
     
     .lang-toggle {
-      position: absolute;
-      top: 20px;
-      right: 25px;
       background: rgba(255, 255, 255, 0.2);
       border: none;
       color: white;
@@ -90,11 +88,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-    
-    body.rtl .lang-toggle {
-      right: auto;
-      left: 25px;
+      min-width: 90px;
+      justify-content: center;
     }
     
     .lang-toggle:hover {
@@ -103,12 +98,13 @@
     }
     
     h1 {
-      font-size: 1.8rem;
-      margin: 10px 0 5px;
+      font-size: 1.6rem;
+      margin: 0 0 5px;
+      line-height: 1.3;
     }
     
     .app-subtitle {
-      font-size: 1rem;
+      font-size: 0.95rem;
       opacity: 0.9;
       font-weight: 400;
     }
@@ -125,6 +121,16 @@
     @media (max-width: 500px) {
       .client-info {
         grid-template-columns: 1fr;
+      }
+      
+      .app-header {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .mbi-brand, .lang-toggle {
+        width: 100%;
+        justify-content: center;
       }
     }
     
@@ -252,12 +258,12 @@
       margin-bottom: 12px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       transition: var(--transition);
-      border-left: 4px solid var(--secondary);
+      border-right: 4px solid var(--secondary);
     }
     
-    body.rtl .task-item {
-      border-left: none;
-      border-right: 4px solid var(--secondary);
+    body:not(.rtl) .task-item {
+      border-right: none;
+      border-left: 4px solid var(--secondary);
     }
     
     .task-item:hover {
@@ -270,16 +276,16 @@
     }
     
     .task-checkbox {
-      margin-right: 15px;
+      margin-left: 15px;
       width: 20px;
       height: 20px;
       cursor: pointer;
       accent-color: var(--success);
     }
     
-    body.rtl .task-checkbox {
-      margin-right: 0;
-      margin-left: 15px;
+    body:not(.rtl) .task-checkbox {
+      margin-left: 0;
+      margin-right: 15px;
     }
     
     .task-text {
@@ -342,12 +348,12 @@
       height: 26px;
       border-radius: 50%;
       font-size: 0.85rem;
-      margin-left: 10px;
+      margin-right: 10px;
     }
     
-    body.rtl .counter {
-      margin-left: 0;
-      margin-right: 10px;
+    body:not(.rtl) .counter {
+      margin-right: 0;
+      margin-left: 10px;
     }
     
     .pwa-notice {
@@ -386,67 +392,69 @@
     }
   </style>
 </head>
-<body>
+<body class="rtl">
   <div class="container">
     <div class="app-header">
       <div class="mbi-brand">MBI</div>
+      <div class="header-content">
+        <h1 id="title">قائمة مهام MBI الاحترافية</h1>
+        <p id="appSubtitle" class="app-subtitle">إدارة خدمات العملاء</p>
+      </div>
       <button id="langBtn" class="lang-toggle">
         <span>🌐</span>
-        <span id="langLabel">العربية</span>
+        <span id="langLabel">English</span>
       </button>
-      <h1 id="title">MBI Professional Checklist</h1>
-      <p id="appSubtitle" class="app-subtitle">Client Services Management</p>
     </div>
     
     <div class="client-info">
       <div class="form-group">
-        <label id="nameLabel">Client Name</label>
-        <input type="text" id="clientName" placeholder="Enter client name">
+        <label id="nameLabel">اسم العميل</label>
+        <input type="text" id="clientName" placeholder="أدخل اسم العميل">
       </div>
       <div class="form-group">
-        <label id="phoneLabel">Phone Number</label>
-        <input type="tel" id="clientPhone" placeholder="Enter phone number">
+        <label id="phoneLabel">رقم الهاتف</label>
+        <input type="tel" id="clientPhone" placeholder="أدخل رقم الهاتف">
       </div>
     </div>
     
     <div class="services-section">
       <h2 class="section-title">
-        <span id="servicesTitle">Services</span>
+        <span id="servicesTitle">الخدمات</span>
         <span id="serviceCounter" class="counter">0</span>
       </h2>
       
       <div class="task-input-group">
-        <input type="text" id="newTask" placeholder="Add new task...">
+        <input type="text" id="newTask" placeholder="أضف مهمة جديدة...">
         <button id="addBtn" class="btn btn-primary">
-          <span id="addLabel">Add</span>
+          <span id="addLabel">إضافة</span>
         </button>
       </div>
       
       <ul id="taskList" class="task-list">
         <li class="empty-state" id="emptyState">
-          <p>No tasks added yet</p>
-          <p>Add your first service to get started</p>
+          <p>لم تتم إضافة مهام بعد</p>
+          <p>أضف خدمتك الأولى للبدء</p>
         </li>
       </ul>
     </div>
     
     <div class="action-buttons">
       <button id="saveBtn" class="btn btn-success">
-        <span id="saveLabel">Save as PDF</span>
+        <span id="saveLabel">حفظ كـ PDF</span>
       </button>
       <button id="clearBtn" class="btn btn-danger">
-        <span id="clearLabel">Clear All</span>
+        <span id="clearLabel">مسح الكل</span>
       </button>
     </div>
     
     <div class="pwa-notice">
-      <span id="pwaText">Install this app for better experience</span>
+      <span id="pwaText">ثبّت التطبيق للحصول على تجربة أفضل</span>
     </div>
   </div>
 
   <script>
-    // Language state (false = English, true = Arabic)
-    let isArabic = false;
+    // Language state (true = Arabic, false = English)
+    let isArabic = true;
     
     // Language packs
     const translations = {

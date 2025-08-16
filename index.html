@@ -107,35 +107,143 @@
     <ul id="taskList" class="task-list"></ul>
 
     <div class="add-section">
-      <input type="text" id="newTask" placeholder="Add new task...">
-      <button onclick="addTask()"><span id="addLabel">Add</span></button>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Checklist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f8f9fa;
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin: 5px 2px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .add-btn { background-color: #007bff; color: white; }
+    .save-btn { background-color: #007bff; color: white; }
+    .clear-btn { background-color: #dc3545; color: white; }
+    .lang-btn { background-color: #28a745; color: white; }
+    ul { margin-top: 10px; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h2 id="title">Client Checklist</h2>
 
-    <button class="lang-toggle" onclick="toggleLanguage()">🌐 <span id="langLabel">العربية</span></button>
-  </div>
+  <label id="nameLabel" for="clientName">Client Name:</label>
+  <input type="text" id="clientName" placeholder="Enter client name">
+
+  <label id="numberLabel" for="clientNumber">Client Number:</label>
+  <input type="text" id="clientNumber" placeholder="Enter client number">
+
+  <label id="taskLabel" for="taskInput">Add New Task:</label>
+  <input type="text" id="taskInput" placeholder="Enter task name">
+
+  <button class="add-btn" onclick="addTask()" id="addBtn">Add Task</button>
+  <button class="save-btn" onclick="savePDF()" id="saveBtn">Save as PDF</button>
+  <button class="clear-btn" onclick="clearAll()" id="clearBtn">Clear All</button>
+  <button class="lang-btn" onclick="toggleLang()" id="langBtn">العربية</button>
+
+  <ul id="taskList"></ul>
+
+  <!-- ✅ Correctly load external libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
-    // Language packs
-    const translations = {
-      en: {
-        title: "MBI Checklist",
-        namePlaceholder: "Client Name",
-        phonePlaceholder: "Phone Number",
-        addPlaceholder: "Add new task...",
-        addButton: "Add",
-        langButton: "العربية"
-      },
-      ar: {
-        title: "قائمة مهام MBI",
-        namePlaceholder: "اسم العميل",
-        phonePlaceholder: "رقم الهاتف",
-        addPlaceholder: "أضف مهمة جديدة...",
-        addButton: "إضافة",
-        langButton: "English"
-      }
-    };
+    let isArabic = false;
 
-    let currentLang = "en";
+    function addTask() {
+      const taskInput = document.getElementById("taskInput");
+      if (taskInput.value.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = taskInput.value;
+        document.getElementById("taskList").appendChild(li);
+        taskInput.value = "";
+      }
+    }
+
+    function clearAll() {
+      document.getElementById("clientName").value = "";
+      document.getElementById("clientNumber").value = "";
+      document.getElementById("taskInput").value = "";
+      document.getElementById("taskList").innerHTML = "";
+    }
+
+    async function savePDF() {
+      const { jsPDF } = window.jspdf;
+      const checklist = document.body;
+      const canvas = await html2canvas(checklist);
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("client-checklist.pdf");
+    }
+
+    function toggleLang() {
+      isArabic = !isArabic;
+
+      if (isArabic) {
+        document.getElementById("title").textContent = "قائمة العملاء";
+        document.getElementById("nameLabel").textContent = "اسم العميل:";
+        document.getElementById("numberLabel").textContent = "رقم العميل:";
+        document.getElementById("taskLabel").textContent = "إضافة مهمة جديدة:";
+        document.getElementById("clientName").placeholder = "أدخل اسم العميل";
+        document.getElementById("clientNumber").placeholder = "أدخل رقم العميل";
+        document.getElementById("taskInput").placeholder = "أدخل اسم المهمة";
+        document.getElementById("addBtn").textContent = "إضافة";
+        document.getElementById("saveBtn").textContent = "حفظ كملف PDF";
+        document.getElementById("clearBtn").textContent = "مسح الكل";
+        document.getElementById("langBtn").textContent = "English";
+        document.body.dir = "rtl";
+      } else {
+        document.getElementById("title").textContent = "Client Checklist";
+        document.getElementById("nameLabel").textContent = "Client Name:";
+        document.getElementById("numberLabel").textContent = "Client Number:";
+        document.getElementById("taskLabel").textContent = "Add New Task:";
+        document.getElementById("clientName").placeholder = "Enter client name";
+        document.getElementById("clientNumber").placeholder = "Enter client number";
+        document.getElementById("taskInput").placeholder = "Enter task name";
+        document.getElementById("addBtn").textContent = "Add Task";
+        document.getElementById("saveBtn").textContent = "Save as PDF";
+        document.getElementById("clearBtn").textContent = "Clear All";
+        document.getElementById("langBtn").textContent = "العربية";
+        document.body.dir = "ltr";
+      }
+    }
+  </script>
+</body>
+</html>rentLang = "en";
 
     function toggleLanguage() {
       currentLang = currentLang === "en" ? "ar" : "en";

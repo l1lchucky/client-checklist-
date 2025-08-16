@@ -44,39 +44,201 @@
       align-items: center;
       margin-bottom: 10px;
     }
-    .services input {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Checklist</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#007bff" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f6f8;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #007bff;
+    }
+    .client-info {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .checklist {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+    .checklist-item input[type="checkbox"] {
       margin-right: 10px;
     }
-    button {
+    .actions {
       margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background: #007bff;
-      border: none;
-      color: white;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
+      display: flex;
+      gap: 10px;
     }
-    button:hover {
+    .btn {
+      flex: 1;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+    .btn:hover {
       background: #0056b3;
+    }
+    .delete-btn {
+      background: #dc3545;
+    }
+    .delete-btn:hover {
+      background: #b02a37;
     }
   </style>
 </head>
 <body>
+  <h1>Client Checklist</h1>
 
-  <div class="container" id="checklist">
-    <h2>Client Checklist</h2>
+  <!-- Client Info -->
+  <div class="client-info">
     <label for="clientName">Client Name:</label>
-    <input type="text" id="clientName" placeholder="Enter client name">
+    <input type="text" id="clientName" placeholder="Enter client name" />
 
-    <label for="phone">Phone Number:</label>
-    <input type="text" id="phone" placeholder="Enter phone number">
+    <label for="clientNumber">Client Number:</label>
+    <input type="text" id="clientNumber" placeholder="Enter client number" />
+  </div>
 
-    <div class="services">
-      <h3>Services</h3>
-      <label><input type="checkbox" checked> Visa Processed</label>
-      <label><input type="checkbox" checked> Hotel Booked</label>
+  <!-- Checklist -->
+  <div class="checklist" id="checklist">
+    <!-- Items will be inserted dynamically -->
+  </div>
+
+  <!-- Add New Item -->
+  <div class="client-info">
+    <label for="newTask">Add New Task:</label>
+    <input type="text" id="newTask" placeholder="Enter task name" />
+    <button class="btn" onclick="addTask()">Add Task</button>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn" onclick="savePDF()">Save as PDF</button>
+    <button class="btn delete-btn" onclick="clearAll()">Clear All</button>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    const checklistEl = document.getElementById("checklist");
+    const newTaskInput = document.getElementById("newTask");
+
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [
+      "Website Design",
+      "Hosting Setup",
+      "Domain Purchase",
+      "SEO Optimization",
+      "Client Training"
+    ];
+
+    function renderTasks() {
+      checklistEl.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const item = document.createElement("div");
+        item.className = "checklist-item";
+        item.innerHTML = `
+          <div>
+            <input type="checkbox" id="task-${index}">
+            <label for="task-${index}">${task}</label>
+          </div>
+          <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+        `;
+        checklistEl.appendChild(item);
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const newTask = newTaskInput.value.trim();
+      if (newTask) {
+        tasks.push(newTask);
+        newTaskInput.value = "";
+        renderTasks();
+      }
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
+    }
+
+    function clearAll() {
+      if (confirm("Are you sure you want to clear all tasks?")) {
+        tasks = [];
+        renderTasks();
+      }
+    }
+
+    function savePDF() {
+      const element = document.createElement("div");
+      const clientName = document.getElementById("clientName").value;
+      const clientNumber = document.getElementById("clientNumber").value;
+
+      element.innerHTML = `
+        <h2>Client Checklist</h2>
+        <p><strong>Client Name:</strong> ${clientName}</p>
+        <p><strong>Client Number:</strong> ${clientNumber}</p>
+        <ul>
+          ${tasks.map((t, i) => {
+            const checked = document.getElementById("task-" + i)?.checked ? "✅" : "❌";
+            return `<li>${checked} ${t}</li>`;
+          }).join("")}
+        </ul>
+      `;
+
+      html2pdf().from(element).save(`${clientName || "checklist"}.pdf`);
+    }
+
+    renderTasks();
+
+    // PWA service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js")
+        .then(() => console.log("Service Worker registered"))
+        .catch(err => console.log("SW registration failed", err));
+    }
+  </script>
+</body>
+</html>   <label><input type="checkbox" checked> Hotel Booked</label>
       <label><input type="checkbox" checked> Flight Ticket Confirmed</label>
       <label><input type="checkbox" checked> Travel Insurance Added</label>
     </div>
